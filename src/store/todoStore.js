@@ -42,6 +42,8 @@ const useStore = create(
           completed: false,
           timeSpent: 0,
           subtasks: [],
+          notes: '',
+          dueDate: null,
           ...todo
         };
         set(state => ({ 

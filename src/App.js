@@ -32,6 +32,8 @@ function App() {
   const [input, setInput] = useState('');
   const [todoPriority, setTodoPriority] = useState('medium');
   const [showTodoForm, setShowTodoForm] = useState(false);
+  const [dueDate, setDueDate] = useState('');
+  const [notes, setNotes] = useState('');
   
   // List-related state
   const [listInput, setListInput] = useState('');
@@ -73,9 +75,14 @@ function App() {
       text: input,
       listId: activeList,
       priority: todoPriority,
+      dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      notes: notes.trim(),
     });
     setInput('');
     setTodoPriority('medium');
+    setDueDate('');
+    setNotes('');
+    setShowTodoForm(false);
     toast.success('Task added successfully! 📝');
   };
 
@@ -227,144 +234,6 @@ function App() {
                 </button>
               </div>
             </div>
-
-            {/* Task Form - Make it responsive */}
-            {showTodoForm && (
-              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                <div className="w-full max-w-lg bg-white rounded-2xl border border-surface-200 
-                  animate-slideIn shadow-natural-lg overflow-hidden max-h-[90vh] my-auto">
-                  {/* Form Header */}
-                  <div className="sticky top-0 bg-white border-b border-surface-200 px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-accent-primary/10 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M12 4v16m8-8H4" />
-                        </svg>
-                      </div>
-                      <h2 className="text-lg font-semibold text-cognitive-primary">New Task</h2>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowTodoForm(false)}
-                      className="p-2 hover:bg-surface-50 rounded-lg transition-colors"
-                    >
-                      <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Form Content - Make it scrollable if needed */}
-                  <div className="overflow-y-auto">
-                    <form onSubmit={handleAddTodo} className="p-6 space-y-6">
-                      {/* Task Input */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-cognitive-primary">
-                          What needs to be done?
-                        </label>
-                        <input
-                          type="text"
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          placeholder="Enter your task here..."
-                          className="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-xl
-                            focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
-                            text-cognitive-primary placeholder-cognitive-tertiary text-base"
-                          autoFocus
-                        />
-                      </div>
-
-                      {/* Priority Selection */}
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-cognitive-primary">
-                          Priority Level
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { value: 'low', label: 'Low', color: 'emerald', icon: (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
-                              </svg>
-                            )},
-                            { value: 'medium', label: 'Medium', color: 'amber', icon: (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M13 10V3L4 14h7v7l9-11h-7z" />
-                              </svg>
-                            )},
-                            { value: 'high', label: 'High', color: 'rose', icon: (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                              </svg>
-                            )}
-                          ].map((priority) => (
-                            <button
-                              key={priority.value}
-                              type="button"
-                              onClick={() => setTodoPriority(priority.value)}
-                              className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
-                                ${todoPriority === priority.value
-                                  ? priority.value === 'high'
-                                    ? 'bg-rose-50 text-rose-600 ring-2 ring-rose-600/20'
-                                    : priority.value === 'medium'
-                                      ? 'bg-amber-50 text-amber-600 ring-2 ring-amber-600/20'
-                                      : 'bg-emerald-50 text-emerald-600 ring-2 ring-emerald-600/20'
-                                  : 'bg-surface-50 text-cognitive-tertiary hover:bg-surface-100'
-                                }
-                              `}
-                            >
-                              <div className="flex items-center justify-center gap-2">
-                                <span className={`transition-colors duration-200
-                                  ${todoPriority === priority.value
-                                    ? priority.value === 'high'
-                                      ? 'text-rose-600'
-                                      : priority.value === 'medium'
-                                        ? 'text-amber-600'
-                                        : 'text-emerald-600'
-                                    : 'text-cognitive-tertiary'
-                                  }`}
-                                >
-                                  {priority.icon}
-                                </span>
-                                {priority.label}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Form Footer */}
-                      <div className="px-6 py-4 bg-surface-50 border-t border-surface-200 flex items-center justify-end gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setShowTodoForm(false)}
-                          className="px-4 py-2 text-cognitive-secondary hover:text-cognitive-primary 
-                            hover:bg-surface-100 rounded-lg transition-colors text-sm font-medium"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={!input.trim()}
-                          className="px-6 py-2 bg-accent-primary text-white rounded-lg 
-                            hover:bg-accent-primary/90 transition-all duration-200
-                            disabled:opacity-50 disabled:cursor-not-allowed
-                            text-sm font-medium flex items-center gap-2"
-                        >
-                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          Add Task
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            )}
           </header>
 
           <div className="flex-1 overflow-y-auto">
@@ -444,7 +313,154 @@ function App() {
         </div>
       </div>
 
-      {/* Quick Actions - Make it responsive */}
+      {/* Task Form Modal - Moved outside the header */}
+      {showTodoForm && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 
+          z-[99999] overflow-y-auto" onClick={() => setShowTodoForm(false)}>
+          <div className="relative my-auto w-full max-w-md bg-white rounded-2xl shadow-xl animate-slideIn 
+            transform transition-all" onClick={e => e.stopPropagation()}>
+            <form onSubmit={handleAddTodo} className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-cognitive-primary">Create New Task</h2>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTodoForm(false);
+                    setInput('');
+                    setDueDate('');
+                    setNotes('');
+                    setTodoPriority('medium');
+                  }}
+                  className="p-2 hover:bg-surface-50 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-cognitive-secondary">
+                    What needs to be done?
+                  </label>
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Enter task name..."
+                    className="w-full px-4 py-2 bg-surface-50 border border-surface-200 rounded-xl
+                      focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Due Date Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-cognitive-secondary">
+                    Due Date (Optional)
+                  </label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="w-full px-4 py-2 bg-surface-50 border border-surface-200 rounded-xl
+                      focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
+                  />
+                </div>
+
+                {/* Priority Selection */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-cognitive-secondary">
+                    Priority
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setTodoPriority('low')}
+                      className={`px-4 py-2 rounded-lg border text-sm font-medium
+                        transition-all duration-200 ${
+                        todoPriority === 'low'
+                          ? 'bg-emerald-500 text-white border-emerald-500' 
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+                        }`}
+                      >
+                        Low
+                      </button>
+                    <button
+                      type="button"
+                      onClick={() => setTodoPriority('medium')}
+                      className={`px-4 py-2 rounded-lg border text-sm font-medium
+                        transition-all duration-200 ${
+                        todoPriority === 'medium'
+                          ? 'bg-amber-500 text-white border-amber-500' 
+                          : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
+                        }`}
+                      >
+                        Medium
+                      </button>
+                    <button
+                      type="button"
+                      onClick={() => setTodoPriority('high')}
+                      className={`px-4 py-2 rounded-lg border text-sm font-medium
+                        transition-all duration-200 ${
+                        todoPriority === 'high'
+                          ? 'bg-rose-500 text-white border-rose-500' 
+                          : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 hover:border-rose-300'
+                        }`}
+                      >
+                        High
+                      </button>
+                  </div>
+                </div>
+
+                {/* Notes Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-cognitive-secondary">
+                    Notes (Optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add any additional notes..."
+                    className="w-full px-4 py-2 bg-surface-50 border border-surface-200 rounded-xl
+                      focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
+                      resize-none"
+                    rows={3}
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowTodoForm(false);
+                      setInput('');
+                      setDueDate('');
+                      setNotes('');
+                      setTodoPriority('medium');
+                    }}
+                    className="px-4 py-2 text-cognitive-secondary hover:bg-surface-hover rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-accent-primary text-white rounded-lg hover:bg-accent-primary/90
+                      disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!input.trim()}
+                  >
+                    Create Task
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
         <QuickActions />
       </div>
@@ -535,22 +551,63 @@ function MobileHeader({ lists, activeList, setShowTodoForm, setShowListForm }) {
     <div className="bg-white border-b border-surface-200">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
-          <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Fox Icon SVG */}
+          <svg className="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Main Face Shape */}
+            <path 
+              d="M10 22C10 14 38 14 38 22C38 32 28 38 24 38C20 38 10 32 10 22Z" 
+              className="fill-[#ff9f43]"
+            />
+            
+            {/* White Face Patch */}
+            <path 
+              d="M14 23C14 19 34 19 34 23C34 30 28 34 24 34C20 34 14 30 14 23Z" 
+              fill="white"
+            />
+            
+            {/* Eyes */}
+            <circle cx="19" cy="24" r="2" fill="#2d3436" />
+            <circle cx="29" cy="24" r="2" fill="#2d3436" />
+            <circle cx="19.5" cy="23.5" r="0.5" fill="white" />
+            <circle cx="29.5" cy="23.5" r="0.5" fill="white" />
+            
+            {/* Nose */}
+            <path 
+              d="M23.5 26.5L24 27L24.5 26.5" 
+              stroke="#2d3436" 
+              strokeWidth="0.5" 
+              strokeLinecap="round"
+            />
+            
+            {/* Ears */}
+            <path 
+              d="M14 20L10 12L18 16Z" 
+              className="fill-[#ff9f43]"
+            />
+            <path 
+              d="M34 20L38 12L30 16Z" 
+              className="fill-[#ff9f43]"
+            />
+            
+            {/* Inner Ears */}
+            <path 
+              d="M14.5 18L12.5 14L16.5 16Z" 
+              className="fill-[#e17055]"
+            />
+            <path 
+              d="M33.5 18L35.5 14L31.5 16Z" 
+              className="fill-[#e17055]"
+            />
+            
+            {/* Cheeks */}
+            <circle cx="17" cy="26" r="1.5" className="fill-[#ffaa5b] opacity-40" />
+            <circle cx="31" cy="26" r="1.5" className="fill-[#ffaa5b] opacity-40" />
           </svg>
-          <h1 className="text-lg font-bold bg-gradient-to-r from-[#ff9f43] to-[#e17055]
+
+          <h1 className="text-xl font-bold bg-gradient-to-r from-[#ff9f43] to-[#e17055]
             bg-clip-text text-transparent">
             FoxTasks
           </h1>
         </div>
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
-        >
-          <svg className="w-6 h-6 text-cognitive-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
       </div>
 
       {/* Mobile Menu */}
@@ -624,136 +681,298 @@ function Sidebar({ lists, activeList, todos, setShowTodoForm, setShowListForm })
   const EmptyStateAnimation = () => (
     <div className="flex flex-col items-center justify-center p-6 text-center">
       <svg 
-        className="w-48 h-48 mb-4" 
-        viewBox="0 0 200 200" 
+        className="w-64 h-64 mb-4" 
+        viewBox="0 0 400 400" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Background Circle */}
-        <circle 
-          cx="100" 
-          cy="100" 
-          r="80" 
-          className="fill-accent-primary/5"
-        />
+        {/* Animated Background Circle with Gradient */}
+        <defs>
+          <radialGradient id="taskGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0.02" />
+          </radialGradient>
+        </defs>
 
-        {/* Animated Elements */}
-        <g className="animate-float">
-          <rect 
-            x="70" 
-            y="60" 
-            width="60" 
-            height="20" 
-            rx="6" 
-            className="fill-accent-primary/20"
+        <circle 
+          cx="200" 
+          cy="200" 
+          r="160" 
+          fill="url(#taskGlow)"
+        >
+          <animate
+            attributeName="r"
+            values="160;165;160"
+            dur="4s"
+            repeatCount="indefinite"
+          />
+        </circle>
+
+        {/* Floating Fox Character */}
+        <g className="origin-center">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0; 0 -10; 0 0"
+            dur="3s"
+            repeatCount="indefinite"
+          />
+
+          {/* Fox Body */}
+          <path 
+            d="M160 200
+               C160 160 240 160 240 200
+               C240 240 210 260 200 260
+               C190 260 160 240 160 200"
+            className="fill-[#ff9f43]"
           >
             <animate
-              attributeName="y"
-              values="60;65;60"
+              attributeName="d"
+              values="
+                M160 200 C160 160 240 160 240 200 C240 240 210 260 200 260 C190 260 160 240 160 200;
+                M165 200 C165 165 235 165 235 200 C235 235 210 255 200 255 C190 255 165 235 165 200;
+                M160 200 C160 160 240 160 240 200 C240 240 210 260 200 260 C190 260 160 240 160 200
+              "
               dur="3s"
               repeatCount="indefinite"
             />
-          </rect>
-        </g>
+          </path>
 
-        <g className="animate-float" style={{ animationDelay: '0.5s' }}>
-          <rect 
-            x="60" 
-            y="90" 
-            width="80" 
-            height="20" 
-            rx="6" 
-            className="fill-accent-secondary/20"
+          {/* White Belly */}
+          <path 
+            d="M170 205
+               C170 185 230 185 230 205
+               C230 235 210 245 200 245
+               C190 245 170 235 170 205"
+            fill="white"
+          />
+
+          {/* Eyes with Blinking Animation */}
+          <g>
+            {/* Left Eye */}
+            <circle cx="185" cy="200" r="4" fill="#2d3436">
+              <animate
+                attributeName="ry"
+                values="4;0.5;4"
+                dur="3.5s"
+                repeatCount="indefinite"
+              />
+            </circle>
+            {/* Right Eye */}
+            <circle cx="215" cy="200" r="4" fill="#2d3436">
+              <animate
+                attributeName="ry"
+                values="4;0.5;4"
+                dur="3.5s"
+                repeatCount="indefinite"
+              />
+            </circle>
+            {/* Eye Shine */}
+            <circle cx="187" cy="198" r="1.5" fill="white" />
+            <circle cx="217" cy="198" r="1.5" fill="white" />
+          </g>
+
+          {/* Animated Tail */}
+          <path 
+            d="M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230"
+            className="fill-[#e17055]"
           >
             <animate
-              attributeName="y"
-              values="90;95;90"
-              dur="2.5s"
+              attributeName="d"
+              values="
+                M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230;
+                M240 210 Q270 170 280 190 Q290 210 270 220 Q250 230 240 230;
+                M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230
+              "
+              dur="2s"
               repeatCount="indefinite"
             />
-          </rect>
+          </path>
+
+          {/* Ears with Wiggle Animation */}
+          <g>
+            {/* Left Ear */}
+            <path 
+              d="M170 170 L150 130 L190 150 Z" 
+              className="fill-[#ff9f43]"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="-5 170 170;5 170 170;-5 170 170"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </path>
+            {/* Right Ear */}
+            <path 
+              d="M230 170 L250 130 L210 150 Z" 
+              className="fill-[#ff9f43]"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="5 230 170;-5 230 170;5 230 170"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </path>
+          </g>
         </g>
 
-        <g className="animate-float" style={{ animationDelay: '1s' }}>
-          <rect 
-            x="75" 
-            y="120" 
-            width="50" 
-            height="20" 
-            rx="6" 
-            className="fill-accent-tertiary/20"
-          >
-            <animate
-              attributeName="y"
-              values="120;125;120"
+        {/* Floating Task Papers with Checkmarks */}
+        <g>
+          {/* Left Paper */}
+          <g transform="translate(-20, 0)">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values="-20 0;-20 -15;-20 0"
+              dur="4s"
+              repeatCount="indefinite"
+            />
+            <rect 
+              x="120" 
+              y="150" 
+              width="60" 
+              height="80" 
+              rx="8" 
+              className="fill-white stroke-accent-primary/30"
+              strokeWidth="2"
+            />
+            <circle cx="140" cy="170" r="4" className="fill-accent-primary/20" />
+            <line x1="155" y1="170" x2="165" y2="170" className="stroke-accent-primary/30" strokeWidth="2" />
+            <line x1="140" y1="190" x2="165" y2="190" className="stroke-accent-primary/30" strokeWidth="2" />
+            <line x1="140" y1="210" x2="160" y2="210" className="stroke-accent-primary/30" strokeWidth="2" />
+          </g>
+
+          {/* Right Paper */}
+          <g transform="translate(20, 0)">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values="20 -10;20 5;20 -10"
               dur="3.5s"
               repeatCount="indefinite"
             />
-          </rect>
+            <rect 
+              x="220" 
+              y="150" 
+              width="60" 
+              height="80" 
+              rx="8" 
+              className="fill-white stroke-accent-secondary/30"
+              strokeWidth="2"
+            />
+            <circle cx="240" cy="170" r="4" className="fill-accent-secondary/20" />
+            <line x1="255" y1="170" x2="265" y2="170" className="stroke-accent-secondary/30" strokeWidth="2" />
+            <line x1="240" y1="190" x2="265" y2="190" className="stroke-accent-secondary/30" strokeWidth="2" />
+            <line x1="240" y1="210" x2="260" y2="210" className="stroke-accent-secondary/30" strokeWidth="2" />
+          </g>
         </g>
 
-        {/* Animated Plus Icons */}
+        {/* Sparkles */}
         <g className="animate-pulse">
-          <path 
-            d="M50 100 h10 M55 95 v10" 
-            className="stroke-accent-primary" 
-            strokeWidth="2" 
-            strokeLinecap="round"
-          />
-        </g>
-        <g className="animate-pulse" style={{ animationDelay: '0.5s' }}>
-          <path 
-            d="M140 80 h10 M145 75 v10" 
-            className="stroke-accent-secondary" 
-            strokeWidth="2" 
-            strokeLinecap="round"
-          />
-        </g>
-        <g className="animate-pulse" style={{ animationDelay: '1s' }}>
-          <path 
-            d="M130 130 h10 M135 125 v10" 
-            className="stroke-accent-tertiary" 
-            strokeWidth="2" 
-            strokeLinecap="round"
-          />
+          {[
+            { x: 140, y: 130, delay: "0s" },
+            { x: 260, y: 130, delay: "0.5s" },
+            { x: 200, y: 280, delay: "1s" }
+          ].map((spark, i) => (
+            <g key={i} style={{ animationDelay: spark.delay }}>
+              <path 
+                d={`M${spark.x} ${spark.y} l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2 z`}
+                className="fill-accent-primary/40"
+              >
+                <animate
+                  attributeName="opacity"
+                  values="0;1;0"
+                  dur="2s"
+                  begin={spark.delay}
+                  repeatCount="indefinite"
+                />
+              </path>
+            </g>
+          ))}
         </g>
 
-        {/* Orbiting Dots */}
-        <circle cx="100" cy="100" r="2" className="fill-accent-primary">
-          <animateMotion
-            path="M0 0 a30 30 0 1 0 60 0 a30 30 0 1 0 -60 0"
-            dur="5s"
-            repeatCount="indefinite"
-          />
-        </circle>
-        <circle cx="100" cy="100" r="1.5" className="fill-accent-secondary">
-          <animateMotion
-            path="M0 0 a40 40 0 1 1 80 0 a40 40 0 1 1 -80 0"
-            dur="7s"
-            repeatCount="indefinite"
-          />
-        </circle>
+        {/* Floating Particles */}
+        {[...Array(6)].map((_, i) => (
+          <circle
+            key={i}
+            cx={150 + i * 20}
+            cy={150 + i * 10}
+            r="2"
+            className="fill-accent-primary/30"
+          >
+            <animate
+              attributeName="cy"
+              values={`${150 + i * 10};${140 + i * 10};${150 + i * 10}`}
+              dur={`${2 + i * 0.5}s`}
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.3;0.7;0.3"
+              dur={`${2 + i * 0.5}s`}
+              repeatCount="indefinite"
+            />
+          </circle>
+        ))}
       </svg>
 
-      <h3 className="text-lg font-semibold text-cognitive-primary mb-2">
-        Create Your First Space
+      <h3 className="text-xl font-semibold text-cognitive-primary mb-2">
+        Let's Get Started! 🦊
       </h3>
-      <p className="text-sm text-cognitive-secondary mb-4 max-w-[200px]">
-        Organize your tasks into spaces to stay focused and productive
+      <p className="text-sm text-cognitive-secondary mb-6 max-w-md text-center">
+        Your task list is empty. Add your first task and let's get productive together!
       </p>
+
       <button
-        onClick={() => setShowListForm(true)}
-        className="px-4 py-2 bg-accent-primary text-white rounded-lg
-          hover:bg-accent-primary/90 transition-all duration-200
-          flex items-center gap-2 text-sm font-medium group"
+        onClick={() => setShowTodoForm(true)}
+        className="px-6 py-3 bg-accent-primary text-white rounded-xl
+          hover:bg-accent-primary/90 transition-all duration-300
+          transform hover:scale-105 hover:shadow-natural-lg
+          flex items-center gap-2 font-medium group"
       >
-        <svg className="w-4 h-4 transition-transform group-hover:rotate-90" 
+        <svg className="w-5 h-5 transition-transform group-hover:rotate-180" 
           fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
             d="M12 4v16m8-8H4" />
         </svg>
-        New Space
+        Create Your First Task
       </button>
+
+      {/* Quick Tips */}
+      <div className="mt-8 grid grid-cols-2 gap-4 max-w-lg mx-auto">
+        <div className="p-4 rounded-xl bg-surface-50 hover:bg-surface-100 
+          transition-colors duration-200">
+          <div className="flex items-start gap-3">
+            <span className="text-xl">⚡️</span>
+            <div>
+              <h4 className="font-medium text-cognitive-primary mb-1">
+                Quick Add
+              </h4>
+              <p className="text-xs text-cognitive-tertiary">
+                Press Ctrl+N to quickly add new tasks
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 rounded-xl bg-surface-50 hover:bg-surface-100 
+          transition-colors duration-200">
+          <div className="flex items-start gap-3">
+            <span className="text-xl">🎯</span>
+            <div>
+              <h4 className="font-medium text-cognitive-primary mb-1">
+                Stay Focused
+              </h4>
+              <p className="text-xs text-cognitive-tertiary">
+                Break down big tasks into smaller ones
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -763,56 +982,56 @@ function Sidebar({ lists, activeList, todos, setShowTodoForm, setShowListForm })
       <div className="px-4 py-3 border-b border-surface-200">
         <div className="flex items-center gap-3">
           {/* Fox Icon - Larger without container */}
-          <svg className="w-12 h-12" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Main Body */}
+          <svg className="w-12 h-12" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Main Face Shape */}
             <path 
-              d="M8 18C8 14 24 14 24 18C24 23 19 26 16 26C13 26 8 23 8 18Z" 
+              d="M10 22C10 14 38 14 38 22C38 32 28 38 24 38C20 38 10 32 10 22Z" 
               className="fill-[#ff9f43]"
             />
             
-            {/* White Belly */}
+            {/* White Face Patch */}
             <path 
-              d="M11 18.5C11 16.5 21 16.5 21 18.5C21 22 18 23.5 16 23.5C14 23.5 11 22 11 18.5Z" 
+              d="M14 23C14 19 34 19 34 23C34 30 28 34 24 34C20 34 14 30 14 23Z" 
               fill="white"
             />
             
-            {/* Face */}
-            <g>
-              {/* Eyes */}
-              <circle cx="13.5" cy="18" r="1.2" fill="#2d3436" />
-              <circle cx="18.5" cy="18" r="1.2" fill="#2d3436" />
-              {/* Eye Shine */}
-              <circle cx="13.8" cy="17.7" r="0.4" fill="white" />
-              <circle cx="18.8" cy="17.7" r="0.4" fill="white" />
-              
-              {/* Nose */}
-              <path 
-                d="M15.7 19.5 Q16 20 16.3 19.5" 
-                stroke="#2d3436" 
-                strokeWidth="0.8" 
-                strokeLinecap="round"
-              />
-            </g>
+            {/* Eyes */}
+            <circle cx="19" cy="24" r="2" fill="#2d3436" />
+            <circle cx="29" cy="24" r="2" fill="#2d3436" />
+            <circle cx="19.5" cy="23.5" r="0.5" fill="white" />
+            <circle cx="29.5" cy="23.5" r="0.5" fill="white" />
+            
+            {/* Nose */}
+            <path 
+              d="M23.5 26.5L24 27L24.5 26.5" 
+              stroke="#2d3436" 
+              strokeWidth="0.5" 
+              strokeLinecap="round"
+            />
             
             {/* Ears */}
             <path 
-              d="M10 16 L8 12 L12 14 Z" 
+              d="M14 20L10 12L18 16Z" 
               className="fill-[#ff9f43]"
             />
             <path 
-              d="M22 16 L24 12 L20 14 Z" 
+              d="M34 20L38 12L30 16Z" 
               className="fill-[#ff9f43]"
             />
             
             {/* Inner Ears */}
             <path 
-              d="M10.5 15 L9.5 13 L11.5 14 Z" 
+              d="M14.5 18L12.5 14L16.5 16Z" 
               className="fill-[#e17055]"
             />
             <path 
-              d="M21.5 15 L22.5 13 L20.5 14 Z" 
+              d="M33.5 18L35.5 14L31.5 16Z" 
               className="fill-[#e17055]"
             />
+            
+            {/* Cheeks */}
+            <circle cx="17" cy="26" r="1.5" className="fill-[#ffaa5b] opacity-40" />
+            <circle cx="31" cy="26" r="1.5" className="fill-[#ffaa5b] opacity-40" />
           </svg>
 
           <h1 className="text-xl font-bold bg-gradient-to-r from-[#ff9f43] to-[#e17055]
@@ -1012,302 +1231,298 @@ function ListItem({ list, isActive }) {
   );
 }
 
-// Update the EmptyTasksAnimation component to accept setShowTodoForm as a prop
+// Replace the existing EmptyTasksAnimation component with this enhanced version
 function EmptyTasksAnimation({ setShowTodoForm }) {
   return (
     <div className="h-full flex flex-col items-center justify-center px-4 -mt-8">
       <svg 
-        className="w-56 h-56 mb-4" 
+        className="w-64 h-64 mb-4" 
         viewBox="0 0 400 400" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Glowing Background Circle */}
+        {/* Animated Background Circle with Gradient */}
+        <defs>
+          <radialGradient id="taskGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.1" />
+            <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0.02" />
+          </radialGradient>
+        </defs>
+
         <circle 
           cx="200" 
           cy="200" 
           r="160" 
-          className="fill-accent-primary/5"
+          fill="url(#taskGlow)"
         >
           <animate
-            attributeName="opacity"
-            values="0.5;0.3;0.5"
-            dur="3s"
+            attributeName="r"
+            values="160;165;160"
+            dur="4s"
             repeatCount="indefinite"
           />
         </circle>
 
-        {/* Fox Body - More Defined Shape */}
-        <g className="animate-float" style={{ animationDuration: '3s' }}>
-          {/* Main Body */}
-          <path 
-            d="M140 190 
-               C140 150 260 150 260 190
-               C260 240 220 280 200 280
-               C180 280 140 240 140 190"
-            className="fill-[#ff9f43]"
+        {/* Floating Fox Character */}
+        <g className="origin-center">
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0; 0 -10; 0 0"
+            dur="3s"
+            repeatCount="indefinite"
           />
+
+          {/* Fox Body */}
+          <path 
+            d="M160 200
+               C160 160 240 160 240 200
+               C240 240 210 260 200 260
+               C190 260 160 240 160 200"
+            className="fill-[#ff9f43]"
+          >
+            <animate
+              attributeName="d"
+              values="
+                M160 200 C160 160 240 160 240 200 C240 240 210 260 200 260 C190 260 160 240 160 200;
+                M165 200 C165 165 235 165 235 200 C235 235 210 255 200 255 C190 255 165 235 165 200;
+                M160 200 C160 160 240 160 240 200 C240 240 210 260 200 260 C190 260 160 240 160 200
+              "
+              dur="3s"
+              repeatCount="indefinite"
+            />
+          </path>
 
           {/* White Belly */}
           <path 
-            d="M160 200
-               C160 180 240 180 240 200
-               C240 240 220 260 200 260
-               C180 260 160 240 160 200"
-            className="fill-white"
+            d="M170 205
+               C170 185 230 185 230 205
+               C230 235 210 245 200 245
+               C190 245 170 235 170 205"
+            fill="white"
           />
 
-          {/* Face - More Expressive */}
-          <g transform="translate(0, -5)">
-            {/* Eyes */}
-            <g className="animate-pulse" style={{ animationDuration: '4s' }}>
-              <circle cx="180" cy="195" r="5" className="fill-[#2d3436]" />
-              <circle cx="220" cy="195" r="5" className="fill-[#2d3436]" />
-              {/* Eye Shine */}
-              <circle cx="182" cy="193" r="2" className="fill-white" />
-              <circle cx="222" cy="193" r="2" className="fill-white" />
-            </g>
-
-            {/* Cute Nose */}
-            <path 
-              d="M198 205 Q200 207 202 205 L200 210 Z" 
-              className="fill-[#2d3436]"
-            />
-
-            {/* Smiling Mouth */}
-            <path 
-              d="M190 215 Q200 225 210 215" 
-              className="stroke-[#2d3436] fill-none"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
+          {/* Eyes with Blinking Animation */}
+          <g>
+            {/* Left Eye */}
+            <circle cx="185" cy="200" r="4" fill="#2d3436">
               <animate
-                attributeName="d"
-                values="M190 215 Q200 225 210 215;M190 220 Q200 230 210 220;M190 215 Q200 225 210 215"
-                dur="3s"
+                attributeName="ry"
+                values="4;0.5;4"
+                dur="3.5s"
                 repeatCount="indefinite"
               />
-            </path>
+            </circle>
+            {/* Right Eye */}
+            <circle cx="215" cy="200" r="4" fill="#2d3436">
+              <animate
+                attributeName="ry"
+                values="4;0.5;4"
+                dur="3.5s"
+                repeatCount="indefinite"
+              />
+            </circle>
+            {/* Eye Shine */}
+            <circle cx="187" cy="198" r="1.5" fill="white" />
+            <circle cx="217" cy="198" r="1.5" fill="white" />
           </g>
 
-          {/* Ears - More Dynamic */}
-          <g className="origin-bottom">
+          {/* Animated Tail */}
+          <path 
+            d="M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230"
+            className="fill-[#e17055]"
+          >
+            <animate
+              attributeName="d"
+              values="
+                M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230;
+                M240 210 Q270 170 280 190 Q290 210 270 220 Q250 230 240 230;
+                M240 210 Q270 190 280 210 Q290 230 270 240 Q250 250 240 230
+              "
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </path>
+
+          {/* Ears with Wiggle Animation */}
+          <g>
             {/* Left Ear */}
             <path 
-              d="M160 160 L140 120 L180 140 Z" 
+              d="M170 170 L150 130 L190 150 Z" 
               className="fill-[#ff9f43]"
             >
               <animateTransform
                 attributeName="transform"
                 type="rotate"
-                values="-5 160 160;5 160 160;-5 160 160"
+                values="-5 170 170;5 170 170;-5 170 170"
                 dur="2s"
                 repeatCount="indefinite"
               />
             </path>
             {/* Right Ear */}
             <path 
-              d="M240 160 L260 120 L220 140 Z" 
+              d="M230 170 L250 130 L210 150 Z" 
               className="fill-[#ff9f43]"
             >
               <animateTransform
                 attributeName="transform"
                 type="rotate"
-                values="5 240 160;-5 240 160;5 240 160"
+                values="5 230 170;-5 230 170;5 230 170"
                 dur="2s"
                 repeatCount="indefinite"
               />
             </path>
           </g>
+        </g>
 
-          {/* Fluffy Tail */}
-          <path 
-            d="M260 200 Q290 180 300 200 Q310 220 290 230 Q270 240 260 220"
-            className="fill-[#e17055]"
-          >
-            <animate
-              attributeName="d"
-              values="
-                M260 200 Q290 180 300 200 Q310 220 290 230 Q270 240 260 220;
-                M260 200 Q290 160 300 180 Q310 200 290 210 Q270 220 260 220;
-                M260 200 Q290 180 300 200 Q310 220 290 230 Q270 240 260 220
-              "
-              dur="3s"
+        {/* Floating Task Papers with Checkmarks */}
+        <g>
+          {/* Left Paper */}
+          <g transform="translate(-20, 0)">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values="-20 0;-20 -15;-20 0"
+              dur="4s"
               repeatCount="indefinite"
             />
-          </path>
-        </g>
-
-        {/* Floating Task Papers with Cute Details */}
-        <g className="animate-float" style={{ animationDuration: '4s' }}>
-          {/* Task Paper 1 */}
-          <g transform="rotate(-15, 120, 160)">
             <rect 
-              x="100" 
-              y="140" 
-              width="40" 
-              height="50" 
-              rx="6" 
+              x="120" 
+              y="150" 
+              width="60" 
+              height="80" 
+              rx="8" 
               className="fill-white stroke-accent-primary/30"
               strokeWidth="2"
-            >
-              <animate
-                attributeName="y"
-                values="140;130;140"
-                dur="4s"
-                repeatCount="indefinite"
-              />
-            </rect>
-            {/* Cute Checkbox */}
-            <rect 
-              x="108" 
-              y="150" 
-              width="8" 
-              height="8" 
-              rx="2" 
-              className="stroke-accent-primary/30"
-              strokeWidth="2"
-              fill="none"
             />
-            {/* Task Lines */}
-            <line x1="122" y1="154" x2="132" y2="154" className="stroke-accent-primary/30" strokeWidth="2" />
-            <line x1="108" y1="165" x2="132" y2="165" className="stroke-accent-primary/30" strokeWidth="2" />
-            <line x1="108" y1="175" x2="122" y2="175" className="stroke-accent-primary/30" strokeWidth="2" />
+            <circle cx="140" cy="170" r="4" className="fill-accent-primary/20" />
+            <line x1="155" y1="170" x2="165" y2="170" className="stroke-accent-primary/30" strokeWidth="2" />
+            <line x1="140" y1="190" x2="165" y2="190" className="stroke-accent-primary/30" strokeWidth="2" />
+            <line x1="140" y1="210" x2="160" y2="210" className="stroke-accent-primary/30" strokeWidth="2" />
           </g>
 
-          {/* Task Paper 2 */}
-          <g transform="rotate(15, 280, 160)">
+          {/* Right Paper */}
+          <g transform="translate(20, 0)">
+            <animateTransform
+              attributeName="transform"
+              type="translate"
+              values="20 -10;20 5;20 -10"
+              dur="3.5s"
+              repeatCount="indefinite"
+            />
             <rect 
-              x="260" 
-              y="140" 
-              width="40" 
-              height="50" 
-              rx="6" 
+              x="220" 
+              y="150" 
+              width="60" 
+              height="80" 
+              rx="8" 
               className="fill-white stroke-accent-secondary/30"
               strokeWidth="2"
-            >
-              <animate
-                attributeName="y"
-                values="140;150;140"
-                dur="3.5s"
-                repeatCount="indefinite"
-              />
-            </rect>
-            {/* Cute Checkbox */}
-            <rect 
-              x="268" 
-              y="150" 
-              width="8" 
-              height="8" 
-              rx="2" 
-              className="stroke-accent-secondary/30"
-              strokeWidth="2"
-              fill="none"
             />
-            {/* Task Lines */}
-            <line x1="282" y1="154" x2="292" y2="154" className="stroke-accent-secondary/30" strokeWidth="2" />
-            <line x1="268" y1="165" x2="292" y2="165" className="stroke-accent-secondary/30" strokeWidth="2" />
-            <line x1="268" y1="175" x2="282" y2="175" className="stroke-accent-secondary/30" strokeWidth="2" />
+            <circle cx="240" cy="170" r="4" className="fill-accent-secondary/20" />
+            <line x1="255" y1="170" x2="265" y2="170" className="stroke-accent-secondary/30" strokeWidth="2" />
+            <line x1="240" y1="190" x2="265" y2="190" className="stroke-accent-secondary/30" strokeWidth="2" />
+            <line x1="240" y1="210" x2="260" y2="210" className="stroke-accent-secondary/30" strokeWidth="2" />
           </g>
         </g>
 
-        {/* Sparkles and Stars */}
+        {/* Sparkles */}
         <g className="animate-pulse">
-          {/* Star 1 */}
-          <path 
-            d="M140 120 L143 127 L150 128 L145 133 L146 140 L140 137 L134 140 L135 133 L130 128 L137 127 Z" 
-            className="fill-accent-primary/40"
-          />
-          {/* Star 2 */}
-          <path 
-            d="M260 120 L263 127 L270 128 L265 133 L266 140 L260 137 L254 140 L255 133 L250 128 L257 127 Z" 
-            className="fill-accent-secondary/40"
-          />
+          {[
+            { x: 140, y: 130, delay: "0s" },
+            { x: 260, y: 130, delay: "0.5s" },
+            { x: 200, y: 280, delay: "1s" }
+          ].map((spark, i) => (
+            <g key={i} style={{ animationDelay: spark.delay }}>
+              <path 
+                d={`M${spark.x} ${spark.y} l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 l4 -2 z`}
+                className="fill-accent-primary/40"
+              >
+                <animate
+                  attributeName="opacity"
+                  values="0;1;0"
+                  dur="2s"
+                  begin={spark.delay}
+                  repeatCount="indefinite"
+                />
+              </path>
+            </g>
+          ))}
         </g>
 
-        {/* Orbiting Elements */}
-        <g>
-          {/* Heart */}
-          <path 
-            d="M200 200 L205 195 Q210 190 205 185 T200 190 L195 185 Q190 190 195 195 Z" 
-            className="fill-accent-primary"
+        {/* Floating Particles */}
+        {[...Array(6)].map((_, i) => (
+          <circle
+            key={i}
+            cx={150 + i * 20}
+            cy={150 + i * 10}
+            r="2"
+            className="fill-accent-primary/30"
           >
-            <animateMotion
-              path="M0 0 a60 60 0 1 0 120 0 a60 60 0 1 0 -120 0"
-              dur="8s"
+            <animate
+              attributeName="cy"
+              values={`${150 + i * 10};${140 + i * 10};${150 + i * 10}`}
+              dur={`${2 + i * 0.5}s`}
               repeatCount="indefinite"
             />
             <animate
               attributeName="opacity"
-              values="1;0.5;1"
-              dur="2s"
+              values="0.3;0.7;0.3"
+              dur={`${2 + i * 0.5}s`}
               repeatCount="indefinite"
             />
-          </path>
-          {/* Star */}
-          <path 
-            d="M200 200 L202 195 L207 195 L203 191 L204 186 L200 189 L196 186 L197 191 L193 195 L198 195 Z" 
-            className="fill-accent-secondary"
-          >
-            <animateMotion
-              path="M0 0 a40 40 0 1 1 80 0 a40 40 0 1 1 -80 0"
-              dur="6s"
-              repeatCount="indefinite"
-            />
-          </path>
-        </g>
+          </circle>
+        ))}
       </svg>
 
       <h3 className="text-xl font-semibold text-cognitive-primary mb-2">
-        Let's Get Organized! 🦊
+        Let's Get Started! 🦊
       </h3>
-      <p className="text-sm text-cognitive-secondary mb-6 max-w-md mx-auto">
-        Your friendly task fox is ready to help you stay organized. Start by adding your first task!
+      <p className="text-sm text-cognitive-secondary mb-6 max-w-md text-center">
+        Your task list is empty. Add your first task and let's get productive together!
       </p>
 
       <button
         onClick={() => setShowTodoForm(true)}
-        className="px-5 py-2.5 bg-accent-primary text-white rounded-xl
+        className="px-6 py-3 bg-accent-primary text-white rounded-xl
           hover:bg-accent-primary/90 transition-all duration-300
           transform hover:scale-105 hover:shadow-natural-lg
           flex items-center gap-2 font-medium group"
       >
-        <span className="relative">
-          <svg className="w-4 h-4 transition-transform group-hover:rotate-180" 
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-              d="M12 4v16m8-8H4" />
-          </svg>
-        </span>
+        <svg className="w-5 h-5 transition-transform group-hover:rotate-180" 
+          fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+            d="M12 4v16m8-8H4" />
+        </svg>
         Create Your First Task
       </button>
 
-      {/* Quick Tips with Fox Theme */}
-      <div className="mt-8 grid grid-cols-2 gap-3 max-w-lg mx-auto text-left">
-        <div className="p-3 rounded-xl bg-surface-50 hover:bg-surface-100 
+      {/* Quick Tips */}
+      <div className="mt-8 grid grid-cols-2 gap-4 max-w-lg mx-auto">
+        <div className="p-4 rounded-xl bg-surface-50 hover:bg-surface-100 
           transition-colors duration-200">
-          <div className="flex items-start gap-2">
-            <span className="text-xl">💡</span>
+          <div className="flex items-start gap-3">
+            <span className="text-xl">⚡️</span>
             <div>
-              <h4 className="font-medium text-cognitive-primary mb-0.5 text-sm">
-                Fox's Wisdom
+              <h4 className="font-medium text-cognitive-primary mb-1">
+                Quick Add
               </h4>
               <p className="text-xs text-cognitive-tertiary">
-                Take one small step at a time, just like a clever fox
+                Press Ctrl+N to quickly add new tasks
               </p>
             </div>
           </div>
         </div>
-        <div className="p-3 rounded-xl bg-surface-50 hover:bg-surface-100 
+        <div className="p-4 rounded-xl bg-surface-50 hover:bg-surface-100 
           transition-colors duration-200">
-          <div className="flex items-start gap-2">
+          <div className="flex items-start gap-3">
             <span className="text-xl">🎯</span>
             <div>
-              <h4 className="font-medium text-cognitive-primary mb-0.5 text-sm">
-                Set Priorities
+              <h4 className="font-medium text-cognitive-primary mb-1">
+                Stay Focused
               </h4>
               <p className="text-xs text-cognitive-tertiary">
-                Focus on what matters most first
+                Break down big tasks into smaller ones
               </p>
             </div>
           </div>
