@@ -10,6 +10,8 @@ import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import toast, { Toaster } from 'react-hot-toast';
 import { isToday } from 'date-fns';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from '@use-gesture/react';
 
 function App() {
   const { 
@@ -228,94 +230,122 @@ function App() {
 
             {/* Task Form - Make it responsive */}
             {showTodoForm && (
-              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 md:relative md:inset-auto md:p-0 md:z-auto">
-                <form onSubmit={handleAddTodo} className="w-full max-w-lg bg-white rounded-xl border border-surface-200 animate-slideIn shadow-glass md:mt-4">
-                  <div className="space-y-4">
-                    {/* Task Input */}
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div className="w-full max-w-lg bg-white rounded-2xl border border-surface-200 
+                  animate-slideIn shadow-natural-lg overflow-hidden max-h-[90vh] my-auto">
+                  {/* Form Header */}
+                  <div className="sticky top-0 bg-white border-b border-surface-200 px-6 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-accent-primary/10 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            d="M12 4v16m8-8H4" />
                         </svg>
-                        <label className="text-sm font-medium text-cognitive-primary">
+                      </div>
+                      <h2 className="text-lg font-semibold text-cognitive-primary">New Task</h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowTodoForm(false)}
+                      className="p-2 hover:bg-surface-50 rounded-lg transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Form Content - Make it scrollable if needed */}
+                  <div className="overflow-y-auto">
+                    <form onSubmit={handleAddTodo} className="p-6 space-y-6">
+                      {/* Task Input */}
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-cognitive-primary">
                           What needs to be done?
                         </label>
+                        <input
+                          type="text"
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          placeholder="Enter your task here..."
+                          className="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-xl
+                            focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
+                            text-cognitive-primary placeholder-cognitive-tertiary text-base"
+                          autoFocus
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Enter your task here..."
-                        className="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-xl
-                          focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
-                          text-cognitive-primary placeholder-cognitive-tertiary text-base"
-                        autoFocus
-                      />
-                    </div>
 
-                    {/* Priority Selection */}
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                            d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                        </svg>
-                        <label className="text-sm font-medium text-cognitive-primary">
+                      {/* Priority Selection */}
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-cognitive-primary">
                           Priority Level
                         </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { value: 'low', label: 'Low', color: 'emerald', icon: (
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                              </svg>
+                            )},
+                            { value: 'medium', label: 'Medium', color: 'amber', icon: (
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M13 10V3L4 14h7v7l9-11h-7z" />
+                              </svg>
+                            )},
+                            { value: 'high', label: 'High', color: 'rose', icon: (
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                              </svg>
+                            )}
+                          ].map((priority) => (
+                            <button
+                              key={priority.value}
+                              type="button"
+                              onClick={() => setTodoPriority(priority.value)}
+                              className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+                                ${todoPriority === priority.value
+                                  ? priority.value === 'high'
+                                    ? 'bg-rose-50 text-rose-600 ring-2 ring-rose-600/20'
+                                    : priority.value === 'medium'
+                                      ? 'bg-amber-50 text-amber-600 ring-2 ring-amber-600/20'
+                                      : 'bg-emerald-50 text-emerald-600 ring-2 ring-emerald-600/20'
+                                  : 'bg-surface-50 text-cognitive-tertiary hover:bg-surface-100'
+                                }
+                              `}
+                            >
+                              <div className="flex items-center justify-center gap-2">
+                                <span className={`transition-colors duration-200
+                                  ${todoPriority === priority.value
+                                    ? priority.value === 'high'
+                                      ? 'text-rose-600'
+                                      : priority.value === 'medium'
+                                        ? 'text-amber-600'
+                                        : 'text-emerald-600'
+                                    : 'text-cognitive-tertiary'
+                                  }`}
+                                >
+                                  {priority.icon}
+                                </span>
+                                {priority.label}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        {['low', 'medium', 'high'].map((priority) => (
-                          <button
-                            key={priority}
-                            type="button"
-                            onClick={() => setTodoPriority(priority)}
-                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all
-                              ${todoPriority === priority
-                                ? priority === 'high' 
-                                  ? 'bg-red-50 text-red-600 ring-2 ring-red-600/20'
-                                  : priority === 'medium'
-                                  ? 'bg-yellow-50 text-yellow-600 ring-2 ring-yellow-600/20'
-                                  : 'bg-green-50 text-green-600 ring-2 ring-green-600/20'
-                                : 'bg-surface-50 text-cognitive-secondary hover:bg-surface-100'
-                              }
-                            `}
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              {priority === 'high' && (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                </svg>
-                              )}
-                              {priority === 'medium' && (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
-                              )}
-                              {priority === 'low' && (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
-                                </svg>
-                              )}
-                              {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center justify-between pt-4 border-t border-surface-200">
-                      <button
-                        type="button"
-                        onClick={() => setShowTodoForm(false)}
-                        className="px-4 py-2 text-cognitive-secondary hover:text-cognitive-primary 
-                          hover:bg-surface-50 rounded-lg transition-colors text-sm font-medium"
-                      >
-                        Cancel
-                      </button>
-                      <div className="flex items-center gap-2">
+                      {/* Form Footer */}
+                      <div className="px-6 py-4 bg-surface-50 border-t border-surface-200 flex items-center justify-end gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setShowTodoForm(false)}
+                          className="px-4 py-2 text-cognitive-secondary hover:text-cognitive-primary 
+                            hover:bg-surface-100 rounded-lg transition-colors text-sm font-medium"
+                        >
+                          Cancel
+                        </button>
                         <button
                           type="submit"
                           disabled={!input.trim()}
@@ -330,9 +360,9 @@ function App() {
                           Add Task
                         </button>
                       </div>
-                    </div>
+                    </form>
                   </div>
-                </form>
+                </div>
               </div>
             )}
           </header>
@@ -353,42 +383,59 @@ function App() {
               </div>
 
               {sortedTodos.length > 0 ? (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="todos">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="space-y-2"
-                      >
-                        {sortedTodos.map((todo, index) => (
-                          <Draggable
-                            key={todo.id}
-                            draggableId={todo.id.toString()}
-                            index={index}
+                <div className="md:block"> {/* Desktop View */}
+                  <div className="hidden md:block">
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <Droppable droppableId="todos">
+                        {(provided) => (
+                          <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="space-y-2"
                           >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`${snapshot.isDragging ? 'opacity-50' : ''}`}
+                            {sortedTodos.map((todo, index) => (
+                              <Draggable
+                                key={todo.id}
+                                draggableId={todo.id.toString()}
+                                index={index}
                               >
-                                <TodoItem
-                                  todo={todo}
-                                  onToggle={toggleTodo}
-                                  onDelete={deleteTodo}
-                                  onUpdate={updateTodo}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`${snapshot.isDragging ? 'opacity-50' : ''}`}
+                                  >
+                                    <TodoItem
+                                      todo={todo}
+                                      onToggle={toggleTodo}
+                                      onDelete={deleteTodo}
+                                      onUpdate={updateTodo}
+                                    />
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
+                  </div>
+                  
+                  {/* Mobile View with Swipe Gestures */}
+                  <div className="md:hidden space-y-2">
+                    {sortedTodos.map(todo => (
+                      <SwipeableTodoItem
+                        key={todo.id}
+                        todo={todo}
+                        onToggle={toggleTodo}
+                        onDelete={deleteTodo}
+                        onUpdate={updateTodo}
+                      />
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <EmptyTasksAnimation setShowTodoForm={setShowTodoForm} />
               )}
@@ -1267,6 +1314,98 @@ function EmptyTasksAnimation({ setShowTodoForm }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Add this new component for swipeable todo items
+function SwipeableTodoItem({ todo, onToggle, onDelete, onUpdate }) {
+  const [{ x }, api] = useSpring(() => ({ x: 0 }));
+
+  // Set up drag gesture
+  const bind = useDrag(({ down, movement: [mx], direction: [xDir], velocity: [vx], cancel }) => {
+    const trigger = vx > 0.5 || Math.abs(mx) > 100;
+    
+    if (trigger && !down) {
+      // Swipe right to complete
+      if (mx > 0) {
+        onToggle(todo.id);
+        api.start({ x: 0 });
+      }
+      // Swipe left to delete
+      if (mx < 0) {
+        if (window.confirm('Are you sure you want to delete this task?')) {
+          onDelete(todo.id);
+        } else {
+          api.start({ x: 0 });
+        }
+      }
+    } else {
+      api.start({ x: down ? mx : 0, immediate: down });
+    }
+  }, { axis: 'x' });
+
+  return (
+    <div className="relative touch-pan-y">
+      {/* Background layers for swipe actions */}
+      <div className="absolute inset-0 flex justify-between items-center px-4">
+        <div className="flex items-center text-green-500">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="ml-2">Complete</span>
+        </div>
+        <div className="flex items-center text-red-500">
+          <span className="mr-2">Delete</span>
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+      </div>
+      
+      {/* Swipeable todo item */}
+      <animated.div
+        {...bind()}
+        style={{ x, touchAction: 'pan-y' }}
+        className="relative bg-white rounded-xl shadow-natural-sm"
+      >
+        <TodoItem
+          todo={todo}
+          onToggle={onToggle}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+        />
+      </animated.div>
+    </div>
+  );
+}
+
+// Update the MobileDrawer component
+function MobileDrawer({ isOpen, onClose, children }) {
+  const [{ y }, api] = useSpring(() => ({ y: '100%' }));
+
+  useEffect(() => {
+    api.start({ y: isOpen ? '0%' : '100%' });
+  }, [isOpen]);
+
+  // Fix: Use different names for unused variables
+  const bind = useDrag(({ down, movement: [_mx, my], velocity: [_vx, vy], cancel }) => {
+    if (my > 200 || vy > 0.5) {
+      onClose();
+    } else {
+      api.start({ y: down ? `${my}px` : '0%', immediate: down });
+    }
+  }, { axis: 'y', bounds: { top: 0 } });
+
+  return (
+    <animated.div
+      {...bind()}
+      style={{ y }}
+      className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-natural-lg 
+        touch-pan-y z-50 max-h-[90vh] overflow-y-auto"
+    >
+      <div className="w-12 h-1.5 bg-surface-200 rounded-full mx-auto my-3" />
+      {children}
+    </animated.div>
   );
 }
 
