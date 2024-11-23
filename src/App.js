@@ -163,36 +163,47 @@ function App() {
         }} 
       />
       
-      <div className="h-screen flex">
-        {/* Left Sidebar - Lists */}
-        <Sidebar 
-          lists={lists} 
-          activeList={activeList} 
-          todos={todos}
-          setShowTodoForm={setShowTodoForm}
-          setShowListForm={setShowListForm}
-        />
+      <div className="h-screen flex flex-col md:flex-row">
+        {/* Sidebar - Now conditionally rendered */}
+        <div className="md:hidden">
+          <MobileHeader 
+            lists={lists} 
+            activeList={activeList}
+            setShowTodoForm={setShowTodoForm}
+            setShowListForm={setShowListForm}
+          />
+        </div>
+        
+        <div className="hidden md:flex">
+          <Sidebar 
+            lists={lists} 
+            activeList={activeList} 
+            todos={todos}
+            setShowTodoForm={setShowTodoForm}
+            setShowListForm={setShowListForm}
+          />
+        </div>
 
-        {/* Main Content with natural styling */}
+        {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="bg-glass-gradient backdrop-blur-sm border-b border-surface-200 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold text-gray-900">
+          <header className="bg-glass-gradient backdrop-blur-sm border-b border-surface-200 p-4 md:p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center justify-between md:gap-4">
+                <h1 className="text-lg md:text-xl font-semibold text-gray-900">
                   {lists.find(list => list.id === activeList)?.name}
                 </h1>
                 <span className="px-2.5 py-1 bg-surface-100 text-gray-600 rounded-lg text-sm">
                   {todos.filter(todo => todo.listId === activeList).length} tasks
                 </span>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="relative">
+              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4">
+                <div className="relative flex-1 md:flex-none">
                   <input
                     type="text"
                     placeholder="Search tasks..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-4 py-2 pl-10 bg-surface-50 border border-surface-200 rounded-xl
+                    className="w-full md:w-64 px-4 py-2 pl-10 bg-surface-50 border border-surface-200 rounded-xl
                       focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
                       text-sm placeholder-surface-300"
                   />
@@ -205,7 +216,7 @@ function App() {
                 <button
                   onClick={() => setShowTodoForm(true)}
                   className="px-4 py-2 bg-accent-primary text-white rounded-xl hover:bg-accent-primary/90
-                    transition-colors text-sm font-medium flex items-center gap-2 shadow-sm"
+                    transition-colors text-sm font-medium flex items-center justify-center gap-2 shadow-sm"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -215,111 +226,114 @@ function App() {
               </div>
             </div>
 
+            {/* Task Form - Make it responsive */}
             {showTodoForm && (
-              <form onSubmit={handleAddTodo} className="mt-4 p-6 bg-white rounded-xl border border-surface-200 animate-slideIn shadow-glass">
-                <div className="space-y-4">
-                  {/* Task Input */}
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      <label className="text-sm font-medium text-cognitive-primary">
-                        What needs to be done?
-                      </label>
-                    </div>
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Enter your task here..."
-                      className="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-xl
-                        focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
-                        text-cognitive-primary placeholder-cognitive-tertiary text-base"
-                      autoFocus
-                    />
-                  </div>
-
-                  {/* Priority Selection */}
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                          d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                      </svg>
-                      <label className="text-sm font-medium text-cognitive-primary">
-                        Priority Level
-                      </label>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['low', 'medium', 'high'].map((priority) => (
-                        <button
-                          key={priority}
-                          type="button"
-                          onClick={() => setTodoPriority(priority)}
-                          className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all
-                            ${todoPriority === priority
-                              ? priority === 'high' 
-                                ? 'bg-red-50 text-red-600 ring-2 ring-red-600/20'
-                                : priority === 'medium'
-                                ? 'bg-yellow-50 text-yellow-600 ring-2 ring-yellow-600/20'
-                                : 'bg-green-50 text-green-600 ring-2 ring-green-600/20'
-                              : 'bg-surface-50 text-cognitive-secondary hover:bg-surface-100'
-                            }
-                          `}
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            {priority === 'high' && (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                              </svg>
-                            )}
-                            {priority === 'medium' && (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                              </svg>
-                            )}
-                            {priority === 'low' && (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
-                              </svg>
-                            )}
-                            {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center justify-between pt-4 border-t border-surface-200">
-                    <button
-                      type="button"
-                      onClick={() => setShowTodoForm(false)}
-                      className="px-4 py-2 text-cognitive-secondary hover:text-cognitive-primary 
-                        hover:bg-surface-50 rounded-lg transition-colors text-sm font-medium"
-                    >
-                      Cancel
-                    </button>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="submit"
-                        disabled={!input.trim()}
-                        className="px-6 py-2 bg-accent-primary text-white rounded-lg 
-                          hover:bg-accent-primary/90 transition-all duration-200
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                          text-sm font-medium flex items-center gap-2"
-                      >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 md:relative md:inset-auto md:p-0 md:z-auto">
+                <form onSubmit={handleAddTodo} className="w-full max-w-lg bg-white rounded-xl border border-surface-200 animate-slideIn shadow-glass md:mt-4">
+                  <div className="space-y-4">
+                    {/* Task Input */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Add Task
+                        <label className="text-sm font-medium text-cognitive-primary">
+                          What needs to be done?
+                        </label>
+                      </div>
+                      <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Enter your task here..."
+                        className="w-full px-4 py-3 bg-surface-50 border border-surface-200 rounded-xl
+                          focus:outline-none focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20
+                          text-cognitive-primary placeholder-cognitive-tertiary text-base"
+                        autoFocus
+                      />
+                    </div>
+
+                    {/* Priority Selection */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                        </svg>
+                        <label className="text-sm font-medium text-cognitive-primary">
+                          Priority Level
+                        </label>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {['low', 'medium', 'high'].map((priority) => (
+                          <button
+                            key={priority}
+                            type="button"
+                            onClick={() => setTodoPriority(priority)}
+                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                              ${todoPriority === priority
+                                ? priority === 'high' 
+                                  ? 'bg-red-50 text-red-600 ring-2 ring-red-600/20'
+                                  : priority === 'medium'
+                                  ? 'bg-yellow-50 text-yellow-600 ring-2 ring-yellow-600/20'
+                                  : 'bg-green-50 text-green-600 ring-2 ring-green-600/20'
+                                : 'bg-surface-50 text-cognitive-secondary hover:bg-surface-100'
+                              }
+                            `}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              {priority === 'high' && (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                              )}
+                              {priority === 'medium' && (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                              )}
+                              {priority === 'low' && (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13l-7 7-7-7m14-8l-7 7-7-7" />
+                                </svg>
+                              )}
+                              {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-between pt-4 border-t border-surface-200">
+                      <button
+                        type="button"
+                        onClick={() => setShowTodoForm(false)}
+                        className="px-4 py-2 text-cognitive-secondary hover:text-cognitive-primary 
+                          hover:bg-surface-50 rounded-lg transition-colors text-sm font-medium"
+                      >
+                        Cancel
                       </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="submit"
+                          disabled={!input.trim()}
+                          className="px-6 py-2 bg-accent-primary text-white rounded-lg 
+                            hover:bg-accent-primary/90 transition-all duration-200
+                            disabled:opacity-50 disabled:cursor-not-allowed
+                            text-sm font-medium flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Add Task
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              </div>
             )}
           </header>
 
@@ -383,8 +397,11 @@ function App() {
         </div>
       </div>
 
-      <QuickActions />
-      
+      {/* Quick Actions - Make it responsive */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <QuickActions />
+      </div>
+
       {showHelp && <Help onClose={() => setShowHelp(false)} />}
 
       {/* List Creation Form */}
@@ -456,6 +473,86 @@ function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Add new MobileHeader component
+function MobileHeader({ lists, activeList, setShowTodoForm, setShowListForm }) {
+  const [showMenu, setShowMenu] = useState(false);
+
+  return (
+    <div className="bg-white border-b border-surface-200">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-3">
+          <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Fox Icon SVG */}
+          </svg>
+          <h1 className="text-lg font-bold bg-gradient-to-r from-[#ff9f43] to-[#e17055]
+            bg-clip-text text-transparent">
+            FoxTasks
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
+        >
+          <svg className="w-6 h-6 text-cognitive-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {showMenu && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50" onClick={() => setShowMenu(false)}>
+          <div className="absolute right-0 top-0 h-full w-64 bg-white shadow-natural-lg"
+            onClick={e => e.stopPropagation()}>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-cognitive-primary">Spaces</h2>
+                <button
+                  onClick={() => setShowMenu(false)}
+                  className="p-2 hover:bg-surface-hover rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-cognitive-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                {lists.map(list => (
+                  <ListItem 
+                    key={list.id} 
+                    list={list} 
+                    isActive={activeList === list.id}
+                    onClick={() => {
+                      useStore.setState({ activeList: list.id });
+                      setShowMenu(false);
+                    }}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowListForm(true);
+                  setShowMenu(false);
+                }}
+                className="mt-4 w-full px-4 py-2 bg-accent-primary text-white rounded-lg
+                  hover:bg-accent-primary/90 transition-colors text-sm font-medium
+                  flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Space
+              </button>
+            </div>
           </div>
         </div>
       )}
